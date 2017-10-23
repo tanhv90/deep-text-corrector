@@ -60,9 +60,9 @@ from __future__ import print_function
 from six.moves import xrange  # pylint: disable=redefined-builtin
 from six.moves import zip  # pylint: disable=redefined-builtin
 
-from tensorflow.contrib.rnn.python.ops import core_rnn
+from tensorflow.python.ops import rnn
+from tensorflow.python.ops import rnn_cell_impl
 from tensorflow.contrib.rnn.python.ops import core_rnn_cell
-from tensorflow.contrib.rnn.python.ops import core_rnn_cell_impl
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
@@ -74,7 +74,7 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.python.util import nest
 
 # TODO(ebrevdo): Remove once _linear is fully deprecated.
-linear = core_rnn_cell_impl._linear  # pylint: disable=protected-access
+linear = rnn_cell_impl._linear  # pylint: disable=protected-access
 
 
 def _extract_argmax_and_embed(embedding,
@@ -180,7 +180,7 @@ def basic_rnn_seq2seq(encoder_inputs,
         It is a 2D Tensor of shape [batch_size x cell.state_size].
   """
   with variable_scope.variable_scope(scope or "basic_rnn_seq2seq"):
-    _, enc_state = core_rnn.static_rnn(cell, encoder_inputs, dtype=dtype)
+    _, enc_state = rnn.static_rnn(cell, encoder_inputs, dtype=dtype)
     return rnn_decoder(decoder_inputs, enc_state, cell)
 
 
@@ -216,7 +216,7 @@ def tied_rnn_seq2seq(encoder_inputs,
   """
   with variable_scope.variable_scope("combined_tied_rnn_seq2seq"):
     scope = scope or "tied_rnn_seq2seq"
-    _, enc_state = core_rnn.static_rnn(
+    _, enc_state = rnn.static_rnn(
         cell, encoder_inputs, dtype=dtype, scope=scope)
     variable_scope.get_variable_scope().reuse_variables()
     return rnn_decoder(
@@ -356,7 +356,7 @@ def embedding_rnn_seq2seq(encoder_inputs,
         cell,
         embedding_classes=num_encoder_symbols,
         embedding_size=embedding_size)
-    _, encoder_state = core_rnn.static_rnn(
+    _, encoder_state = rnn.static_rnn(
         encoder_cell, encoder_inputs, dtype=dtype)
 
     # Decoder.
@@ -848,7 +848,7 @@ def embedding_attention_seq2seq(encoder_inputs,
         cell,
         embedding_classes=num_encoder_symbols,
         embedding_size=embedding_size)
-    encoder_outputs, encoder_state = core_rnn.static_rnn(
+    encoder_outputs, encoder_state = rnn.static_rnn(
         encoder_cell, encoder_inputs, dtype=dtype)
 
     # First calculate a concatenation of encoder outputs to put attention on.
@@ -972,7 +972,7 @@ def one2many_rnn_seq2seq(encoder_inputs,
         cell,
         embedding_classes=num_encoder_symbols,
         embedding_size=embedding_size)
-    _, encoder_state = core_rnn.static_rnn(
+    _, encoder_state = rnn.static_rnn(
         encoder_cell, encoder_inputs, dtype=dtype)
 
     # Decoder.
